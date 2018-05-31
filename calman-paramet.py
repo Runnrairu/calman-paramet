@@ -51,7 +51,7 @@ def p(y):#事前分布
     else:
         return 0
 
-def q(y):#事後分布（定数倍は除く）
+def q(y):#事後分布（定数除く）
     return p(y)*L(y)
 
 
