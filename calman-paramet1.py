@@ -1,7 +1,8 @@
 ﻿# -*- coding: utf-8 -*-
 import numpy as np
-from scipy import optimize
+import scipy
 import matplotlib.pyplot as plt
+
 
 
 def a(theta):
@@ -34,16 +35,18 @@ def m_t_y(y,Y,i,T):
     return m_y
 
 def L(y,Y,i,T):#対数尤度関数を書く 
-    m_y=m_t_y(y,Y,i,T+1)#m_yの計算
+    m_y=m_t_y(y,Y,i,T)#m_yの計算
     sumx=0
     sumt=0
-    step = int((T+1)*nt)
+    step = int(T*nt)
     for t in range(step):      
         sumt +=  (m_y[t]*m_y[t]-m_theta1[i][t]*m_theta1[i][t])*delta_t
         sumx +=  (m_y[t]-m_theta1[i][t])*(Y[i][t+1]-Y[i][t])
         
     return sumx/(step*sigma_o*sigma_o)-sumt/(step*2*sigma_o*sigma_o)
 
+def Ly(y):
+    return -L(y[0],Y,i,cutT)
 
 
 e=2.71828182846
@@ -51,7 +54,7 @@ e=2.71828182846
 T=10.0
 nt=1000#分割係数
 n=int(T)*nt
-test_case = 1000 #いくつサンプルパスを作るか
+test_case = 10 #いくつサンプルパスを作るか
 X =[[0 for t in range(n+1)]for i in range(test_case)]
 Y =[[0 for t in range(n+1)]for i in range(test_case)]
 delta_t = 1.0/nt
@@ -86,23 +89,16 @@ for i in range(test_case):
         Y[i][t+1] = Y[i][t]+deltaY
         n_theta1[t+1] = n_theta1[t]+pow(e,float(t/nt)*r_theta1)*deltaY
     m_theta1[i]=m_t_y(theta1,Y,i,T)
-cutT=5
-while(cutT<(int(T)-1)):
-    opt_theta = [0]*(1001)#区間を1000分し、カウントする
+cutT=8
+while(cutT<(int(T))):
+    
     for i in range(test_case):
-        y=0.5
+        argmax_y=scipy.optimize.brute(Ly,((0.5,1.5),(0.1,0.2)))
+        print(argmax_y[0])
+        print(theta)
         
-        maxL=-100000000000000#Lの最大値。とにかく小さくとる
-        miny=-1 #argmax_y L 
-        for j in range(1001):#区間の1000分割
-            
-            y += 1.0/1000
-            L_y=L(y,Y,i,cutT+1)
-            if maxL < L_y:
-                miny= j
-                maxL= L_y
-        opt_theta[miny] += 1
-    plt.plot(opt_theta)
+        
+        
     cutT += 4
         
     

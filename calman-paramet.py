@@ -5,13 +5,13 @@ import matplotlib.pyplot as plt
 
 
 def a(theta):
-    return theta/10
+    return theta/5
 
 def b(theta):
-    return 0.2
+    return 0.4
 
 def c(theta):
-    return 0.05
+    return 0.5
     
 def r(theta):
     x = a(theta)*a(theta)+b(theta)*b(theta)*c(theta)*c(theta)/(sigma_o*sigma_o)
@@ -30,14 +30,14 @@ def m_t_y(y,Y,i,T):
     m_y = [0]*(step+1)
     for t in range(step):
         
-        m_y[t+1] = m_y[t]+(gamma_y-a_y)*m_y[t]+gamma_y*(Y[i][t+1]-Y[i][t])
+        m_y[t+1] = m_y[t]+(gamma_y-a_y)*m_y[t]*delta_t+gamma_y*(Y[i][t+1]-Y[i][t])
     return m_y
 
 def L(y,Y,i,T):#対数尤度関数を書く 
-    m_y=m_t_y(y,Y,i,T+1)#m_yの計算
+    m_y=m_t_y(y,Y,i,T)#m_yの計算
     sumx=0
     sumt=0
-    step = int((T+1)*nt)
+    step = int(T*nt)
     for t in range(step):      
         sumt +=  (m_y[t]*m_y[t]-m_theta1[i][t]*m_theta1[i][t])*delta_t
         sumx +=  (m_y[t]-m_theta1[i][t])*(Y[i][t+1]-Y[i][t])
@@ -48,10 +48,10 @@ def L(y,Y,i,T):#対数尤度関数を書く
 
 e=2.71828182846
  #時刻は1秒1000分割、10秒
-T=10.0
+T=6.0
 nt=1000#分割係数
 n=int(T)*nt
-test_case = 1000 #いくつサンプルパスを作るか
+test_case = 5 #いくつサンプルパスを作るか
 X =[[0 for t in range(n+1)]for i in range(test_case)]
 Y =[[0 for t in range(n+1)]for i in range(test_case)]
 delta_t = 1.0/nt
@@ -87,23 +87,24 @@ for i in range(test_case):
         n_theta1[t+1] = n_theta1[t]+pow(e,float(t/nt)*r_theta1)*deltaY
     m_theta1[i]=m_t_y(theta1,Y,i,T)
 cutT=5
-while(cutT<(int(T)-1)):
-    opt_theta = [0]*(1001)#区間を1000分し、カウントする
+while(cutT<(int(T))):
+    #opt_theta = [0]*(10001)#区間を1000分し、カウントする
     for i in range(test_case):
         y=0.5
         
         maxL=-100000000000000#Lの最大値。とにかく小さくとる
-        miny=-1 #argmax_y L 
-        for j in range(1001):#区間の1000分割
+        argmax_y=-1 #argmax_y L 
+        for j in range(10001):#区間の1000分割
             
-            y += 1.0/1000
-            L_y=L(y,Y,i,cutT+1)
+            y += 1.0/10000
+            L_y=L(y,Y,i,cutT)
             if maxL < L_y:
-                miny= j
+                argmax_y= j
                 maxL= L_y
-        opt_theta[miny] += 1
-    plt.plot(opt_theta)
-    cutT += 4
+        #opt_theta[argmax_y] += 1
+        print(argmax_y/10000.0+0.5)
+    #plt.plot(opt_theta)
+    cutT += 10
         
     
     
