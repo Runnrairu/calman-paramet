@@ -42,16 +42,16 @@ def L(y,Y,i,T):#対数尤度関数を書く
         sumt +=  (m_y[t]*m_y[t]-m_theta1[i][t]*m_theta1[i][t])*delta_t
         sumx +=  (m_y[t]-m_theta1[i][t])*(Y[i][t+1]-Y[i][t])
         
-    return sumx/(step*sigma_o*sigma_o)-sumt/(step*2*sigma_o*sigma_o)
+    return sumx/(sigma_o*sigma_o)-sumt/(2*sigma_o*sigma_o)
 
 
 
 e=2.71828182846
  #時刻は1秒1000分割、10秒
-T=6.0
+T=100.0
 nt=1000#分割係数
 n=int(T)*nt
-test_case = 5 #いくつサンプルパスを作るか
+test_case = 100 #いくつサンプルパスを作るか
 X =[[0 for t in range(n+1)]for i in range(test_case)]
 Y =[[0 for t in range(n+1)]for i in range(test_case)]
 delta_t = 1.0/nt
@@ -86,8 +86,8 @@ for i in range(test_case):
         Y[i][t+1] = Y[i][t]+deltaY
         n_theta1[t+1] = n_theta1[t]+pow(e,float(t/nt)*r_theta1)*deltaY
     m_theta1[i]=m_t_y(theta1,Y,i,T)
-cutT=5
-while(cutT<(int(T))):
+cutT=99
+while(cutT<=(int(T))):
     #opt_theta = [0]*(10001)#区間を1000分し、カウントする
     for i in range(test_case):
         y=0.5
